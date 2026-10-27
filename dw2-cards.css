@@ -1,0 +1,325 @@
+/* DW2 ASSEMBLY COPY of parts/listing-design/cards.css — imports resolved to root dw2-symbols.css/dw2-tokens.css, asset paths rebased. */
+/* ==========================================================================
+   DOORWAY V2: LISTING CARDS AS SMALL DOORWAYS
+   Style: Photography-First × Editorial. Tiles are solid. Marigold is the
+   only accent. Revamp anatomy and class names kept; new parts are dw2-card-*.
+
+   Import order matters: symbols.css first, tokens.css second, so the
+   canonical palette in tokens.css wins every --ooru-* name both files
+   define (cream, ink, green, green-deep, line).
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Card-scoped values. Shadows are tinted with the ink token (no new hex).
+   -------------------------------------------------------------------------- */
+.card {
+  --dw2-card-cut: 24px;                                  /* the one diagonal */
+  --dw2-card-sh1: 0 1px 2px color-mix(in srgb, var(--ooru-ink) 6%, transparent),
+                  0 2px 10px color-mix(in srgb, var(--ooru-ink) 5%, transparent);
+  --dw2-card-sh2: 0 2px 6px color-mix(in srgb, var(--ooru-ink) 7%, transparent),
+                  0 12px 30px color-mix(in srgb, var(--ooru-ink) 10%, transparent);
+  --dw2-card-ease: cubic-bezier(.22, 1, .36, 1);         /* revamp card curve */
+}
+
+/* --------------------------------------------------------------------------
+   The card: a solid white tile. Overflow stays visible so the breakout can
+   rise out of the top edge; the photo is clipped by its own layer instead.
+   -------------------------------------------------------------------------- */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--ooru-card);
+  border: 1px solid var(--ooru-line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--dw2-card-sh1);
+  overflow: visible;
+  color: var(--ooru-ink);
+  font-family: var(--ooru-font);
+  font-size: var(--t-base);
+  line-height: var(--lh-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .25s var(--dw2-card-ease), box-shadow .25s var(--dw2-card-ease);
+}
+@media (hover: hover) {
+  .card:hover { transform: translateY(-4px); box-shadow: var(--dw2-card-sh2); }
+}
+.card.is-hover { transform: translateY(-4px); box-shadow: var(--dw2-card-sh2); }
+.card:active   { transform: scale(.99); }
+.card:focus-visible {
+  outline: 3px solid var(--ooru-marigold);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Scene: an unclipped 16:10 wrapper. Chips, signage and the cut photo
+   layer sit inside it.
+   -------------------------------------------------------------------------- */
+.card-scene {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: visible;
+}
+
+/* The clipped photo layer. It bleeds over the 1px tile edge to the card's
+   outer edge, rounds with the card's top corners, and its bottom edge
+   rises toward the right: one diagonal, nothing else. */
+.dw2-card-cut {
+  position: absolute;
+  inset: -1px -1px 0 -1px;
+  overflow: hidden;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--dw2-card-cut)), 0 100%);
+  background: var(--ooru-sage);                         /* shows only while the photo loads */
+}
+.dw2-card-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--dw2-card-focus, 50% 46%);
+  transition: filter .25s var(--dw2-card-ease);
+}
+
+/* --------------------------------------------------------------------------
+   Scene chips. All solid; type never below 15px.
+   -------------------------------------------------------------------------- */
+.chip-date,
+.chip-status,
+.tag-sample {
+  position: absolute;
+  z-index: 2;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 6px var(--s-3);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+
+/* Date: the marigold chip. Ink on marigold is the lawful pairing (6.9:1). */
+.chip-date {
+  top: var(--s-3);
+  left: var(--s-3);
+  background: var(--ooru-marigold);
+  color: var(--ooru-ink);
+  font-variant-numeric: tabular-nums;
+  box-shadow: var(--dw2-card-sh1);
+}
+
+.chip-status {
+  left: var(--s-3);
+  bottom: var(--s-3);
+  background: var(--ooru-card);
+  color: var(--ooru-ink);
+}
+.chip-status.open  { background: var(--ooru-green); color: var(--ooru-card); }
+.chip-status.ended { background: var(--ooru-ink-2); color: var(--ooru-card); }
+
+.tag-sample {
+  top: var(--s-3);
+  right: var(--s-3);
+  background: var(--ooru-green-deep);
+  color: var(--ooru-card);
+}
+
+/* --------------------------------------------------------------------------
+   Signage: the hanging board symbol with the festival name set as real
+   HTML text on its empty cream face. Face box in the 56×48 viewBox:
+   x 11.3–45.5, y 18.4–38.4, tilted about -2deg.
+   -------------------------------------------------------------------------- */
+.dw2-card-signage {
+  --ooru-size: 104px;
+  position: absolute;
+  z-index: 1;
+  right: var(--s-3);
+  bottom: calc(var(--dw2-card-cut) + var(--s-2));
+  width: calc(var(--ooru-size) * 56 / 48);
+  aspect-ratio: 56 / 48;
+  pointer-events: none;
+}
+.dw2-card-signage .ooru-sym {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--ooru-ink) 30%, transparent));
+}
+.dw2-card-signage-text {
+  position: absolute;
+  left: 21%;
+  top: 39%;
+  width: 59%;
+  height: 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ooru-ink);
+  font-size: var(--t-base);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: var(--track-head);
+  text-align: center;
+  text-wrap: balance;
+  transform: rotate(-2deg);
+}
+
+/* --------------------------------------------------------------------------
+   Breakout: one symbol per card, rising out of the card's top edge.
+   It intrudes only 14px into the scene, so it clears the date chip and
+   the Sample tag at every card width. Decorative, never a target.
+   -------------------------------------------------------------------------- */
+.dw2-card-breakout {
+  position: absolute;
+  z-index: 3;
+  bottom: calc(100% - 14px);
+  right: calc(var(--s-3) + 76px);                       /* sits left of the Sample tag */
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px color-mix(in srgb, var(--ooru-ink) 22%, transparent));
+  transition: transform .3s var(--dw2-card-ease);
+  transform-origin: 50% 100%;
+}
+.dw2-card-breakout.ooru-sym--diya             { --ooru-size: 60px; }
+.dw2-card-breakout.ooru-sym--marigold-cluster { --ooru-size: 56px; }
+.dw2-card-breakout.ooru-sym--stall-awning     { --ooru-size: 46px; right: calc(var(--s-3) + 68px); }
+
+@media (hover: hover) {
+  .card:hover .dw2-card-breakout { transform: translateY(-3px) rotate(-3deg); }
+}
+.card.is-hover .dw2-card-breakout { transform: translateY(-3px) rotate(-3deg); }
+
+/* Diya flame: same bridge as symbols.css, triggered by the card. Best-effort
+   through an external sprite reference. */
+.card:hover .ooru-sym--diya,
+.card.is-hover .ooru-sym--diya,
+.card:focus-visible .ooru-sym--diya {
+  --ooru-flame-anim: diya-flicker 2.6s cubic-bezier(.22, 1, .36, 1) infinite alternate;
+}
+
+/* --------------------------------------------------------------------------
+   Ended: the scene calms. Photo desaturated and lifted, symbols quietened.
+   Text keeps full contrast.
+   -------------------------------------------------------------------------- */
+.card.is-ended .dw2-card-photo   { filter: grayscale(.85) contrast(.88) brightness(1.06); }
+.card.is-ended .dw2-card-signage .ooru-sym,
+.card.is-ended .dw2-card-breakout { filter: grayscale(.7); }
+
+/* --------------------------------------------------------------------------
+   Body: the revamp anatomy, unchanged in order.
+   -------------------------------------------------------------------------- */
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  padding: var(--s-3) var(--s-4) var(--s-5);
+}
+
+.card-fest {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--ooru-ink-2);
+}
+.fdot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ooru-marigold);
+}
+.card-rating {
+  margin-left: auto;
+  color: var(--ooru-ink);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card-title {
+  margin: 0;
+  font-size: var(--t-md);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.card-venue,
+.card-fact {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ooru-ink-2);
+}
+.card-fact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--s-2);
+}
+.card-fact b { color: var(--ooru-ink); }
+.badge-v { color: var(--ooru-green); font-weight: 700; }
+.badge-u { color: var(--ooru-ink); font-weight: 700; }
+
+.card-entry {
+  margin-top: auto;
+  padding-top: var(--s-2);
+  font-size: var(--t-base);
+  font-weight: 800;
+  color: var(--ooru-ink);
+}
+.card-entry .free { color: var(--ooru-green); }
+
+/* Stall parts */
+.stallbar {
+  height: 8px;
+  margin-top: var(--s-1);
+  border-radius: var(--r-pill);
+  background: var(--ooru-cream-2);
+  overflow: hidden;
+}
+.stallbar i {
+  display: block;
+  height: 100%;
+  background: var(--ooru-green);
+  border-radius: inherit;
+}
+.price-row { display: flex; align-items: baseline; gap: var(--s-2); }
+.price {
+  font-size: var(--t-lg);
+  font-weight: 800;
+  letter-spacing: var(--track-head);
+  font-variant-numeric: tabular-nums;
+}
+.per {
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--ooru-ink-2);
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion: no lift, no press, no breakout tilt, no flame. The forced
+   hover specimen keeps its shadow only.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .dw2-card-breakout,
+  .dw2-card-photo { transition: none; }
+  .card:hover,
+  .card.is-hover,
+  .card:active,
+  .card:hover .dw2-card-breakout,
+  .card.is-hover .dw2-card-breakout { transform: none; }
+  .card:hover .ooru-sym--diya,
+  .card.is-hover .ooru-sym--diya,
+  .card:focus-visible .ooru-sym--diya { --ooru-flame-anim: none; }
+}

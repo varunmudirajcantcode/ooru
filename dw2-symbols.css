@@ -1,0 +1,169 @@
+/* DW2 ASSEMBLY COPY of parts/symbols/symbols.css — copied to doorway-v2 root; no file url() to rebase (its only url() is the in-document fragment url(#ooru-mg)); sprite copied to symbols.svg. Source of truth remains the part file. */
+/* ==========================================================================
+   OORU SYMBOLS: "What the street hangs at its door"
+   Companion to symbols.svg. Inline that sprite once in <body>, then:
+
+     <svg class="ooru-sym ooru-sym--toran" role="img" aria-label="Toran">
+       <use href="#ooru-toran"/>
+     </svg>
+
+   Sizing model: --ooru-size is the pixel height of 48 grid units.
+   Every symbol is drawn on that grid (primary stroke 3u, detail stroke 1.5u),
+   so one --ooru-size gives the same stroke weight across the whole family.
+   Wide symbols (toran, awning, signboard) get proportionally wider boxes;
+   the garland gets a narrower, taller box.
+
+   Palette: sage #D9E2D2 · cream #FAF6EC · green #14532D · green-deep #0F3D21
+            green-lite #1B6B3A · marigold #F59E0B · marigold-deep #D97706
+            terracotta #C05621 · ink #1A202C
+   Marigold amber is the only accent. Terracotta appears only where the
+   subject calls for it (diya clay, awning stripes, signboard wood).
+
+   Everything here is scoped to ooru-* / diya-flame-* names. There are no
+   resets and no element selectors.
+   ========================================================================== */
+
+:root {
+  /* palette */
+  --ooru-sage: #D9E2D2;
+  --ooru-cream: #FAF6EC;
+  --ooru-green: #14532D;
+  --ooru-green-deep: #0F3D21;
+  --ooru-green-lite: #1B6B3A;
+  --ooru-marigold: #F59E0B;
+  --ooru-marigold-deep: #D97706;
+  --ooru-terracotta: #C05621;
+  --ooru-ink: #1A202C;
+
+  /* roles */
+  --ooru-line: var(--ooru-green-deep);
+  --ooru-leaf: var(--ooru-green-lite);
+  --ooru-clay: var(--ooru-terracotta);
+  --ooru-clay-deep: #8A3A16; /* shadowed terracotta: diya oil well, wood grain */
+  --ooru-paper: var(--ooru-cream);
+}
+
+/* --------------------------------------------------------------------------
+   Color hooks. These override the hex fallback attributes in symbols.svg.
+   The gradient keeps its hex stops; .ooru-f-mg just points at it.
+   -------------------------------------------------------------------------- */
+.ooru-f-mg            { fill: url(#ooru-mg); }
+.ooru-f-marigold      { fill: var(--ooru-marigold); }
+.ooru-f-marigold-deep { fill: var(--ooru-marigold-deep); }
+.ooru-f-green         { fill: var(--ooru-green); }
+.ooru-f-green-lite    { fill: var(--ooru-leaf); }
+.ooru-f-green-deep    { fill: var(--ooru-green-deep); }
+.ooru-f-terracotta    { fill: var(--ooru-clay); }
+.ooru-f-clay-deep     { fill: var(--ooru-clay-deep); }
+.ooru-f-cream         { fill: var(--ooru-paper); }
+.ooru-f-sage          { fill: var(--ooru-sage); }
+.ooru-f-line          { fill: var(--ooru-line); }
+
+.ooru-s-line          { stroke: var(--ooru-line); }
+.ooru-s-ink           { stroke: var(--ooru-ink); }
+.ooru-s-cream         { stroke: var(--ooru-paper); }
+.ooru-s-vein          { stroke: var(--ooru-sage); }
+.ooru-s-grain         { stroke: var(--ooru-clay-deep); }
+.ooru-s-green-deep    { stroke: var(--ooru-green-deep); }
+
+/* --------------------------------------------------------------------------
+   Sizing
+   -------------------------------------------------------------------------- */
+.ooru-sym {
+  width: var(--ooru-size, 48px);
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  overflow: visible; /* marigold lobes may kiss the viewBox edge */
+}
+
+/* viewBox 0 0 96 48 */
+.ooru-sym--toran            { width: calc(var(--ooru-size, 56px) * 2);        aspect-ratio: 96 / 48; }
+/* viewBox 0 0 24 64 */
+.ooru-sym--garland          { width: calc(var(--ooru-size, 48px) * 0.5);      aspect-ratio: 24 / 64; }
+/* viewBox 0 0 48 48 */
+.ooru-sym--diya             { width: var(--ooru-size, 48px);                  aspect-ratio: 1 / 1; }
+/* viewBox 0 0 48 48 */
+.ooru-sym--marigold-cluster { width: var(--ooru-size, 48px);                  aspect-ratio: 1 / 1; }
+/* viewBox 0 0 72 48 */
+.ooru-sym--stall-awning     { width: calc(var(--ooru-size, 64px) * 1.5);      aspect-ratio: 72 / 48; }
+/* viewBox 0 0 56 48 */
+.ooru-sym--signage-board    { width: calc(var(--ooru-size, 64px) * 56 / 48);  aspect-ratio: 56 / 48; }
+/* viewBox 0 0 48 48 */
+.ooru-sym--banana-leaf      { width: var(--ooru-size, 48px);                  aspect-ratio: 1 / 1; }
+
+/* Size utilities. Each one sets the height of the 48-unit grid. */
+.ooru-sym--sm { --ooru-size: 24px; }
+.ooru-sym--md { --ooru-size: 36px; }
+.ooru-sym--lg { --ooru-size: 48px; }
+
+/* --------------------------------------------------------------------------
+   Detail hiding below 32px
+
+   1) Custom-property bridge (primary). Detail groups in the sprite carry
+      style="display:var(--ooru-detail-display, inline)". Custom properties
+      inherit into the <use> shadow tree, so this works for same-document
+      <use> references.
+   2) Descendant rule (inlined art). When the symbol markup is pasted inline
+      instead of referenced, this selector matches directly. It needs
+      !important to beat the inline style above.
+
+   Honest limitation: selectors cannot cross the <use> shadow boundary, so
+   rule 2 does nothing for <use>. With an external sprite reference
+   (href="symbols.svg#id"), page styles don't reach the external document,
+   so hiding relies on the inherited bridge and is best-effort.
+   -------------------------------------------------------------------------- */
+.ooru-sym--sm,
+.ooru-sym--nodetail { --ooru-detail-display: none; }
+
+.ooru-sym--sm .ooru-detail,
+.ooru-sym--nodetail .ooru-detail { display: none !important; }
+
+/* --------------------------------------------------------------------------
+   Diya flame flicker
+   Duration 2.6s, eased out with cubic-bezier(.22,1,.36,1), infinite alternate.
+   Motion stays under 5%: scale 0.97–1.03, skew at most 1.2deg,
+   opacity 0.92–1. The flame pivots from its base.
+
+   Same bridge pattern: the animation is passed down through
+   --ooru-flame-anim, so both triggers work for inline art and for <use>
+   instances (best-effort for external sprite files):
+     - add .diya-flame--flicker to the host svg (or to the flame group), or
+     - hover a .ooru-sym--diya host.
+   -------------------------------------------------------------------------- */
+.diya-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: var(--ooru-flame-anim, none);
+}
+
+.diya-flame--flicker,
+.ooru-sym--diya:hover {
+  --ooru-flame-anim: diya-flicker 2.6s cubic-bezier(.22, 1, .36, 1) infinite alternate;
+}
+
+@keyframes diya-flicker {
+  0%   { transform: scale(1, 1)       skewX(0deg);    opacity: 1; }
+  30%  { transform: scale(.98, 1.03)  skewX(-1deg);   opacity: .96; }
+  55%  { transform: scale(1.02, .98)  skewX(.8deg);   opacity: 1; }
+  80%  { transform: scale(.99, 1.02)  skewX(-.5deg);  opacity: .93; }
+  100% { transform: scale(1.01, .97)  skewX(1.2deg);  opacity: .98; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ooru-sym,
+  .diya-flame,
+  .diya-flame--flicker,
+  .ooru-sym--diya:hover {
+    --ooru-flame-anim: none !important;
+  }
+
+  .diya-flame,
+  .diya-flame--flicker,
+  .ooru-sym--diya:hover .diya-flame {
+    animation: none !important;
+    transform: none !important;
+  }
+}

@@ -1,0 +1,339 @@
+/* DW2 ASSEMBLY COPY of parts/motion/motion.css — header comment only; the source has no url() references, so nothing was rebased. */
+/* ==========================================================================
+   DOORWAY V2: UI MICRO-INTERACTIONS (part 6, site layer only)
+   Style: Photography-First × Editorial — an unframed, full-bleed photographic
+   festival street carries an Editorial interior on solid cream tiles; deep
+   green is trust, cream is calm, marigold amber is the only accent.
+
+   Load AFTER the revamp styles, tokens.css and cards.css. This file extends
+   the shipped revamp motion; it never replaces it.
+
+   Boundary: the engine-owned background stack (integration.md §1) is not
+   styled, transitioned or selected anywhere in this file. Movement uses
+   transform/opacity only. Colour/border/shadow transitions appear only
+   where the revamp already transitions them for state.
+   Spec and reasoning: motion-spec.md.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   a. MOTION TOKENS
+   Two curves only. No third curve is introduced (Emil's .23 curve is
+   deliberately not used; tokens.css already has an expo-out).
+   -------------------------------------------------------------------------- */
+:root {
+  /* New micro-interactions. Source: tokens.css --dw2-ease-expo-out. */
+  --dw2-m-ease: var(--dw2-ease-expo-out, cubic-bezier(.16, 1, .3, 1));
+  /* Extending revamp/cards. Source: revamp viewin, .rv, card lift;
+     cards.css --dw2-card-ease. */
+  --dw2-m-ease-revamp: cubic-bezier(.22, 1, .36, 1);
+
+  --dw2-m-fast: 140ms;    /* press. Revamp .fchip:active .15s / .btn .18s, tightened to Emil's 100–160ms band */
+  --dw2-m-med: 200ms;     /* state colour/border/ring. Revamp .catchip/.fchip/.btn background .2s */
+  --dw2-m-reveal: 600ms;  /* section reveal. Revamp .rv .6s */
+  --dw2-m-view: 450ms;    /* view enter. Revamp .view.on viewin .45s */
+  --dw2-m-tick: 220ms;    /* sent tick stroke draw. New, inside micro band 120–220ms */
+  --dw2-m-settle: 160ms;  /* sent button settle. New, inside micro band */
+  --dw2-m-toast: 220ms;   /* toast enter/exit. New, inside micro band */
+}
+
+/* --------------------------------------------------------------------------
+   b. BUTTONS
+   Revamp ships .btn:active scale(.97) with transform .18s default ease.
+   Here: same press, faster and on the expo curve. Background/shadow keep
+   their revamp state transitions, retimed to --dw2-m-med on the same curve.
+   No hover lift: the revamp buttons do not lift, and a lift on a control
+   seen tens of times a day fails the frequency gate.
+   -------------------------------------------------------------------------- */
+.btn {
+  transition:
+    transform var(--dw2-m-fast) var(--dw2-m-ease),
+    box-shadow var(--dw2-m-med) var(--dw2-m-ease),
+    background-color var(--dw2-m-med) var(--dw2-m-ease),
+    border-color var(--dw2-m-med) var(--dw2-m-ease);
+}
+.btn:active { transform: scale(.97); }
+
+/* Ghost has no hover state in the revamp. Parity with .fchip:hover
+   (border darkens), using the token secondary ink. Pointer devices only. */
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:not(:disabled):not([aria-disabled="true"]):hover {
+    border-color: var(--ooru-ink-2);
+  }
+}
+
+/* Disabled: no press, no hover response, no motion at all. */
+.btn:disabled,
+.btn[aria-disabled="true"] { cursor: default; }
+.btn:disabled:active,
+.btn[aria-disabled="true"]:active { transform: none; }
+.btn-primary:disabled:hover,
+.btn-primary[aria-disabled="true"]:hover {
+  background: var(--ooru-green);
+  box-shadow: none;
+}
+
+/* Back button: revamp has :active scale(.97) but no transition, so it
+   snaps. This adds only the missing transition. */
+.backbtn {
+  transition: transform var(--dw2-m-fast) var(--dw2-m-ease);
+}
+
+/* See all: a text link, so no scale (scaling text mid-line reads as a
+   glitch). Opacity press only. */
+.seeall {
+  transition: opacity var(--dw2-m-fast) var(--dw2-m-ease);
+}
+.seeall:active { opacity: .7; }
+
+/* --------------------------------------------------------------------------
+   c. CHIPS
+   State colours come from the revamp .on rule; only their timing changes.
+   The .on toggle never scales the chip (filters are toggled tens of times a
+   session). Only the physical press scales, and it releases in 140ms.
+   No check/dot cue: the existing .fdot sits in both states already, and a
+   cue would need new markup.
+   -------------------------------------------------------------------------- */
+.catchip,
+.fchip {
+  transition:
+    transform var(--dw2-m-fast) var(--dw2-m-ease),
+    background-color var(--dw2-m-med) var(--dw2-m-ease),
+    border-color var(--dw2-m-med) var(--dw2-m-ease),
+    color var(--dw2-m-med) var(--dw2-m-ease);
+}
+.catchip:active,                         /* gap: revamp gives .catchip no press */
+.fchip:active { transform: scale(.97); }
+
+/* --------------------------------------------------------------------------
+   d. CARDS: INTENTIONALLY NOTHING
+   cards.css already owns every card motion:
+     - hover lift translateY(-4px) + shadow, 250ms, card curve
+     - :active scale(.99)
+     - .is-hover specimen state
+     - breakout translateY(-3px) rotate(-3deg), 300ms
+     - .dw2-card-photo filter transition (ended state)
+     - diya flame through the symbols.css --ooru-flame-anim bridge
+     - :focus-visible marigold outline
+     - its own reduced-motion block
+   No gap was found, so this file adds no .card rule. Redeclaring any of
+   these would create two sources of truth. Restraint is the deliverable.
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------------
+   e. SEARCH PILL
+   The revamp :focus-within rule (green border + 3px ring) is kept as is;
+   only its timing is added. The icon picks up the green on focus.
+   No width change, no movement: the pill is focused many times a session
+   and a moving field is harder to type into.
+   -------------------------------------------------------------------------- */
+.searchbar {
+  transition:
+    border-color var(--dw2-m-med) var(--dw2-m-ease),
+    box-shadow var(--dw2-m-med) var(--dw2-m-ease);
+}
+.searchbar > svg {
+  transition: color var(--dw2-m-med) var(--dw2-m-ease);
+}
+.searchbar:focus-within > svg { color: var(--ooru-green); }
+
+/* --------------------------------------------------------------------------
+   f. STALL INTEREST + DRAWN TICK
+   Markup (assembly or motion.js inserts it):
+     <svg class="dw2-tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+   Path length is ~19.8 units, so a 20-unit dash covers it.
+   EXCEPTION, the only one in this file: the tick animates
+   stroke-dashoffset (not transform/opacity). A stroke draw is the one
+   motion that reads as "written down" and costs a single 20-unit path.
+   Keyframes (not a transition) because the tick is inserted together with
+   .is-sent and has no prior style to transition from.
+   Nothing else: no burst, no halo, no colour flash.
+   -------------------------------------------------------------------------- */
+.dw2-tick {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+.dw2-tick path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 0;                  /* drawn by default (static/re-rendered) */
+}
+
+/* Press before send: same as .btn press, restated for non-.btn hosts. */
+.dw2-interest-btn {
+  transition: transform var(--dw2-m-fast) var(--dw2-m-ease);
+}
+.dw2-interest-btn:not(:disabled):active { transform: scale(.97); }
+
+/* Settle into the sent state, then draw the tick. Applies to
+   .dw2-interest-btn.is-sent and to the revamp's disabled sent button once
+   motion.js marks it. .dw2-static skips the animation (button already sent
+   on an earlier visit). */
+.is-sent:not(.dw2-static) {
+  animation: dw2-sent-settle var(--dw2-m-settle) var(--dw2-m-ease) both;
+}
+.is-sent:not(.dw2-static) .dw2-tick path {
+  animation: dw2-tick-draw var(--dw2-m-tick) var(--dw2-m-ease) 60ms both;
+}
+
+@keyframes dw2-sent-settle {
+  from { opacity: .6; transform: scale(.98); }
+  to   { opacity: 1;  transform: none; }
+}
+@keyframes dw2-tick-draw {
+  from { stroke-dashoffset: 20; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* --------------------------------------------------------------------------
+   g. SECTION REVEALS
+   Revamp .rv restated with the same values, plus an optional stagger delay.
+   [data-dw2-reveal] is the doorway-v2 alias (.is-in) for new sections.
+   Stagger only via --dw2-m-delay set inline by assembly (0–80ms). Never
+   automatic nth-child delays.
+   -------------------------------------------------------------------------- */
+.rv,
+[data-dw2-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dw2-m-reveal) var(--dw2-m-ease-revamp) var(--dw2-m-delay, 0ms),
+    transform var(--dw2-m-reveal) var(--dw2-m-ease-revamp) var(--dw2-m-delay, 0ms);
+}
+.rv.in,
+.rv.is-in,
+[data-dw2-reveal].in,
+[data-dw2-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   h. VIEW ENTER
+   Exact copy of revamp viewin (10px rise, 450ms, revamp curve) under a
+   doorway-v2 name. Revamp's own viewin keyframes are left untouched.
+   -------------------------------------------------------------------------- */
+.dw2-view-enter {
+  animation: dw2-viewin var(--dw2-m-view) var(--dw2-m-ease-revamp) both;
+}
+@keyframes dw2-viewin {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* --------------------------------------------------------------------------
+   i. TOP BAR
+   motion.js adds .is-scrolled AND .dw2-bar--scrolled past 8px of scroll.
+   The glass itself (alpha .92, blur 12px) is tokens.css .dw2-bar--scrolled
+   and is not redeclared here. This adds the timing and a 1px line in the
+   existing line colour, so the bar edge firms up as content slides under.
+   -------------------------------------------------------------------------- */
+.topbar,
+.dw2-bar {
+  transition:
+    background-color var(--dw2-m-med) var(--dw2-m-ease),
+    box-shadow var(--dw2-m-med) var(--dw2-m-ease);
+}
+.topbar.is-scrolled,
+.dw2-bar.is-scrolled,
+.topbar.dw2-bar--scrolled,
+.dw2-bar.dw2-bar--scrolled {
+  box-shadow: 0 1px 0 var(--ooru-line);
+}
+
+/* --------------------------------------------------------------------------
+   j. TOAST
+   Revamp position kept (fixed, left 50%, bottom 24px / above the bottom
+   nav). The base .toast is not changed, so the revamp toast still works
+   without these hooks. Opt-in:
+     .is-in   enter: from 8px below + transparent, to settled
+     .is-out  exit: back down to the same edge (spatial consistency)
+   Assembly sets [hidden] after the 220ms exit (transitionend).
+   -------------------------------------------------------------------------- */
+.toast.is-in,
+.toast.is-out {
+  transition:
+    transform var(--dw2-m-toast) var(--dw2-m-ease),
+    opacity var(--dw2-m-toast) var(--dw2-m-ease);
+}
+.toast.is-in {
+  opacity: 1;
+  transform: translateX(-50%);
+}
+@starting-style {
+  .toast.is-in {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+.toast.is-out {
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   FOCUS: never removed for motion. Marigold 3px, offset per tokens.css.
+   Every control here keeps its revamp 48px min-height.
+   -------------------------------------------------------------------------- */
+.btn:focus-visible,
+.backbtn:focus-visible,
+.seeall:focus-visible,
+.catchip:focus-visible,
+.fchip:focus-visible,
+.dw2-interest-btn:focus-visible,
+.searchbar:focus-within:has(:focus-visible) {
+  outline: 3px solid var(--ooru-marigold);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   k. REDUCED MOTION (last). Mirrors the revamp: nothing moves, every state
+   still changes instantly and stays usable. Reveals visible, tick drawn,
+   toast centred (its translateX is layout, not motion, so it stays).
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .backbtn,
+  .seeall,
+  .catchip,
+  .fchip,
+  .searchbar,
+  .searchbar > svg,
+  .dw2-interest-btn,
+  .rv,
+  [data-dw2-reveal],
+  .topbar,
+  .dw2-bar,
+  .toast.is-in,
+  .toast.is-out {
+    transition: none;
+  }
+  .is-sent,
+  .is-sent .dw2-tick path,
+  .dw2-view-enter {
+    animation: none;
+  }
+  .btn:active,
+  .backbtn:active,
+  .catchip:active,
+  .fchip:active,
+  .dw2-interest-btn:active,
+  .is-sent,
+  .dw2-view-enter {
+    transform: none;
+  }
+  .rv,
+  [data-dw2-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+  .dw2-tick path { stroke-dashoffset: 0; }
+  .toast.is-in,
+  .toast.is-out { transform: translateX(-50%); }
+}

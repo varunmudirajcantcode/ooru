@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="ooru-sprite" width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true" focusable="false">
+  <!--
+    OORU SYMBOLS: "What the street hangs at its door"
+    One sprite, 7 symbols, one family. Inline this file once near the top of <body>, then reference:
+      <svg class="ooru-sym" role="img" aria-label="Toran"><use href="#ooru-toran"/></svg>
+    Add the matching modifier class from symbols.css (toran, garland, diya, marigold-cluster,
+    stall-awning, signage-board, banana-leaf) so the box takes the right aspect ratio.
+    For extra robustness you may also put the symbol's viewBox on the host svg.
+
+    Why not display:none: a display:none sprite stops the shared gradient (ooru-mg) from painting
+    in several browsers. width/height 0 plus position:absolute keeps defs renderable.
+
+    GRID AND STROKES: every symbol is drawn on a 48-unit-tall grid (garland is 64 tall, same unit).
+      viewBoxes: toran 96x48, garland 24x64, diya 48x48, marigold-cluster 48x48,
+                 stall-awning 72x48, signage-board 56x48, banana-leaf 48x48.
+      Primary stroke = 3 units (cords, outlines, wick, posts). At 24px tall this is 1.5px.
+      Detail stroke  = 1.5 units (hanging threads, veins, grain, highlights).
+      symbols.css sizes each symbol so 48 units always equal the same pixel height, so these
+      stroke weights stay visually identical across the family.
+      Marigold heads and leaves are fill-only silhouettes, which keeps strokes from scaling with them.
+
+    COLOR HOOKS (one approach, used throughout): ooru-f-* (fill) and ooru-s-* (stroke) class names
+    defined in symbols.css. Every painted element also has a hex fill/stroke presentation attribute,
+    so the art renders correctly with no CSS. The class rules override those attributes when CSS loads.
+    The gradient uses hex stops on purpose, because CSS-variable stops are unreliable.
+
+    DETAIL: groups with class ooru-detail (inner ruffles, veins, grain, rim highlights) carry an inline
+    display:var(ooru-detail-display) bridge so they can hide at small sizes, even through use.
+
+    Shared parts in defs: ooru-mg (gradient), ooru-head-a (10 lobes), ooru-head-b (9 lobes),
+    ooru-leaf, ooru-leaf-d.
+  -->
+  <defs>
+    <linearGradient id="ooru-mg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#D97706"/>
+    </linearGradient>
+
+    <!-- Marigold head A: 10 uneven lobes, centred on 0,0, outer radius about 9.3 units -->
+    <g id="ooru-head-a">
+      <path class="ooru-f-mg" fill="url(#ooru-mg)" d="M6.2 0 A2.2 2.2 0 1 1 4.91 3.44 A2.4 2.4 0 1 1 1.84 6.02 A2.1 2.1 0 1 1 -1.88 5.8 A2.3 2.3 0 1 1 -5.03 3.79 A2.2 2.2 0 1 1 -6 -0.1 A2 2 0 1 1 -5.08 -3.56 A2.4 2.4 0 1 1 -1.98 -6.09 A2.2 2.2 0 1 1 2.09 -5.73 A2.1 2.1 0 1 1 5.02 -3.65 A2.3 2.3 0 1 1 6.2 0 Z"/>
+      <g class="ooru-detail" style="display:var(--ooru-detail-display, inline)">
+        <path class="ooru-f-marigold-deep" fill="#D97706" fill-opacity=".55" d="M4.2 0 C4.4 2.4 2.3 4.3 -0.2 4.1 C-2.6 4 -4.3 2.2 -4 -0.3 C-3.8 -2.6 -1.9 -4.3 0.4 -4 C2.6 -3.8 4 -2.1 4.2 0 Z"/>
+        <path class="ooru-f-marigold-deep" fill="#D97706" d="M1.9 -0.2 A1.6 1.5 0 1 1 -1.3 -0.2 A1.6 1.5 0 1 1 1.9 -0.2 Z"/>
+      </g>
+    </g>
+
+    <!-- Marigold head B: 9 uneven lobes, centred on 0,0, outer radius about 9 units -->
+    <g id="ooru-head-b">
+      <path class="ooru-f-mg" fill="url(#ooru-mg)" d="M6.11 1.08 A2.5 2.5 0 1 1 3.7 4.73 A2.3 2.3 0 1 1 0 6.3 A2.6 2.6 0 1 1 -3.94 4.53 A2.4 2.4 0 1 1 -6.2 1.1 A2.6 2.6 0 1 1 -5.23 -3.14 A2.3 2.3 0 1 1 -2.12 -5.83 A2.7 2.7 0 1 1 2.15 -5.6 A2.4 2.4 0 1 1 5.46 -3.15 A2.5 2.5 0 1 1 6.11 1.08 Z"/>
+      <g class="ooru-detail" style="display:var(--ooru-detail-display, inline)">
+        <path class="ooru-f-marigold-deep" fill="#D97706" fill-opacity=".55" d="M3.9 0.8 C3.6 3.1 1.6 4.4 -0.8 4 C-3 3.6 -4.3 1.6 -3.9 -0.8 C-3.5 -3 -1.4 -4.3 0.9 -3.9 C3 -3.5 4.2 -1.5 3.9 0.8 Z"/>
+        <path class="ooru-f-marigold-deep" fill="#D97706" d="M1.5 0.3 A1.5 1.6 0 1 1 -1.5 0.3 A1.5 1.6 0 1 1 1.5 0.3 Z"/>
+      </g>
+    </g>
+
+    <!-- Hanging leaves: origin at the stalk, pointing down (+y), about 9.7 units long, asymmetric -->
+    <path id="ooru-leaf" class="ooru-f-green-lite" fill="#1B6B3A" d="M0 0 C2.6 1.8 3.3 5.4 0.5 9.6 C-2.7 5.6 -2.3 1.7 0 0 Z"/>
+    <path id="ooru-leaf-d" class="ooru-f-green" fill="#14532D" d="M0 0 C2.2 2 2.9 5.8 -0.3 9.8 C-2.9 5.2 -2.1 1.5 0 0 Z"/>
+  </defs>
+
+  <!-- TORAN: viewBox 0 0 96 48, a horizontal swag with three sagging arcs -->
+  <symbol id="ooru-toran" viewBox="0 0 96 48">
+    <title>Toran: marigold swag hung across a doorway</title>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path class="ooru-s-line" stroke="#0F3D21" stroke-width="1.5" d="M7 12.5 C7.3 16 6.7 19 7.1 22 M34 13 C34.4 19 33.6 24 34.3 29.5 M62 14 C61.6 21 62.5 28 62 34.5 M89 13 C88.7 18 89.4 22 89 26.5"/>
+      <path class="ooru-s-line" stroke="#0F3D21" stroke-width="3" d="M7 8 C13.5 16.5 27.5 17.5 34 9 C40.5 18.5 55.5 19.5 62 9.5 C68 16.5 82.5 16 89 8.5"/>
+      <use href="#ooru-leaf" transform="translate(7.1 22) scale(.95)"/>
+      <use href="#ooru-leaf-d" transform="translate(20.5 14.8) rotate(4) scale(.85)"/>
+      <use href="#ooru-leaf" transform="translate(34.3 34.6) scale(1)"/>
+      <use href="#ooru-leaf-d" transform="translate(48 16.3) rotate(-3) scale(1.1)"/>
+      <use href="#ooru-leaf" transform="translate(62 39.8) rotate(3) scale(.7)"/>
+      <use href="#ooru-leaf-d" transform="translate(75.6 14.2) rotate(6) scale(.8)"/>
+      <use href="#ooru-leaf-d" transform="translate(89 30.6) rotate(-4) scale(.8)"/>
+      <use href="#ooru-head-a" transform="translate(34.3 32.4) scale(.34)"/>
+      <use href="#ooru-head-b" transform="translate(62 37.3) rotate(25) scale(.36)"/>
+      <use href="#ooru-head-a" transform="translate(89 28.6) rotate(60) scale(.3)"/>
+      <use href="#ooru-head-b" transform="translate(7 8) rotate(-20) scale(.46)"/>
+      <use href="#ooru-head-a" transform="translate(34 9) scale(.56)"/>
+      <use href="#ooru-head-b" transform="translate(62 9.5) rotate(14) scale(.54)"/>
+      <use href="#ooru-head-a" transform="translate(89 8.5) rotate(40) scale(.48)"/>
+    </g>
+  </symbol>
+
+  <!-- GARLAND: viewBox 0 0 24 64, a vertical strand with a swaying thread -->
+  <symbol id="ooru-garland" viewBox="0 0 24 64">
+    <title>Garland: a hanging strand of marigolds</title>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path class="ooru-s-line" stroke="#0F3D21" stroke-width="3" d="M12 1.5 C13.6 12 10.4 22 12.2 32 C13.9 42 10.8 50 12 57"/>
+      <path class="ooru-f-line" fill="#0F3D21" d="M13.4 57.6 A1.4 1.3 0 1 1 10.6 57.6 A1.4 1.3 0 1 1 13.4 57.6 Z"/>
+      <use href="#ooru-leaf-d" transform="translate(12 44.5) rotate(20) scale(1.1)"/>
+      <use href="#ooru-leaf" transform="translate(12.3 44.8) rotate(-24) scale(.9)"/>
+      <use href="#ooru-head-b" transform="translate(12.1 39.2) rotate(-12) scale(.57)"/>
+      <use href="#ooru-head-a" transform="translate(12.3 28.6) rotate(33) scale(.6)"/>
+      <use href="#ooru-head-b" transform="translate(11.6 17.8) rotate(18) scale(.62)"/>
+      <use href="#ooru-head-a" transform="translate(12.4 7.2) scale(.58)"/>
+    </g>
+  </symbol>
+
+  <!-- DIYA: viewBox 0 0 48 48, a clay bowl with a pinched spout; the flame is a separate, targetable group -->
+  <symbol id="ooru-diya" viewBox="0 0 48 48">
+    <title>Diya: clay oil lamp with flame</title>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path class="ooru-f-terracotta" fill="#C05621" d="M16.4 40.2 C16.8 42.6 25.2 43.1 26.6 40.4 Z"/>
+      <path class="ooru-f-terracotta" fill="#C05621" d="M6.5 29.5 C9.5 27.2 22 26.4 31.5 27.4 C35.5 27.6 39 27 42.5 26.2 C41.2 29.6 39 31.6 36.5 33.4 C33.5 39 27 41.6 20.5 41.2 C13.2 40.8 8.2 36.6 6.5 29.5 Z"/>
+      <path class="ooru-f-clay-deep" fill="#8A3A16" d="M9 29.8 C14 28.4 26 28 33.5 29 C28.5 31 15 31.2 9 29.8 Z"/>
+      <g class="ooru-detail" style="display:var(--ooru-detail-display, inline)">
+        <path class="ooru-s-cream" stroke="#FAF6EC" stroke-width="1.5" stroke-opacity=".7" d="M10.5 32.8 C16.5 34.4 26 34.4 32 32.9"/>
+        <path class="ooru-s-grain" stroke="#8A3A16" stroke-width="1.5" stroke-opacity=".55" d="M14.6 37.4 C18 38.6 23 38.7 27.4 37.6"/>
+      </g>
+      <path class="ooru-s-ink" stroke="#1A202C" stroke-width="3" d="M34.6 29.2 C35.6 27.2 36.4 25.4 37.4 23.6"/>
+      <g class="diya-flame" id="diya-flame">
+        <path class="ooru-f-mg" fill="url(#ooru-mg)" d="M37.6 23.8 C33 23.6 31.6 19.6 33.6 15.6 C35 12.8 36.4 10.6 36.6 6.8 C39.6 9.6 42.8 13.4 42.6 17.6 C42.4 21.2 40.4 23.9 37.6 23.8 Z"/>
+        <path class="ooru-f-cream" fill="#FAF6EC" d="M37.7 22.4 C35.6 22.3 35 20.2 35.9 18.2 C36.6 16.6 37.3 15.4 37.5 13.6 C39 15.2 40.4 17.2 40.2 19.3 C40 21.2 39 22.4 37.7 22.4 Z"/>
+      </g>
+    </g>
+  </symbol>
+
+  <!-- MARIGOLD CLUSTER: viewBox 0 0 48 48, three heads of different sizes with two leaves tucked behind -->
+  <symbol id="ooru-marigold-cluster" viewBox="0 0 48 48">
+    <title>Marigold cluster</title>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <use href="#ooru-leaf-d" transform="translate(20 30) rotate(50) scale(1.6)"/>
+      <use href="#ooru-leaf" transform="translate(28 28) rotate(-62) scale(1.45)"/>
+      <g class="ooru-detail" style="display:var(--ooru-detail-display, inline)">
+        <path class="ooru-s-green-deep" stroke="#0F3D21" stroke-width="1.5" stroke-opacity=".6" d="M19.5 30.5 C16 33.5 12.5 36.2 9.8 38.6 M28.5 28.6 C32.5 30.6 36 32.4 39.2 33.9"/>
+      </g>
+      <use href="#ooru-head-b" transform="translate(32 25.5) rotate(22) scale(.9)"/>
+      <use href="#ooru-head-a" transform="translate(21 20) scale(1.15)"/>
+      <use href="#ooru-head-a" transform="translate(17.5 32) rotate(-35) scale(.7)"/>
+    </g>
+  </symbol>
+
+  <!-- STALL AWNING: viewBox 0 0 72 48, a sagging, perspective canopy with terracotta and cream stripes and an uneven scalloped hem -->
+  <symbol id="ooru-stall-awning" viewBox="0 0 72 48">
+    <title>Stall awning</title>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path class="ooru-s-line" stroke="#0F3D21" stroke-width="3" d="M6.2 28.2 C6.5 34 6.1 40 6.6 45.5 M65.8 27.2 C65.5 33 66 39 65.4 45.5"/>
+      <path class="ooru-f-terracotta" fill="#C05621" d="M10 8 L16.6 7.75 L12 28.6 A4.4 4.4 0 0 1 4 27.5 Z"/>
+      <path class="ooru-f-cream" fill="#FAF6EC" d="M16.6 7.75 L23 7.5 L20.2 29.4 A4.3 4.3 0 0 1 12 28.6 Z"/>
+      <path class="ooru-f-terracotta" fill="#C05621" d="M23 7.5 L29.6 7.25 L28 29.9 A4.7 4.7 0 0 1 20.2 29.4 Z"/>
+      <path class="ooru-f-cream" fill="#FAF6EC" d="M29.6 7.25 L36 7 L36 30 A4.2 4.2 0 0 1 28 29.9 Z"/>
+      <path class="ooru-f-terracotta" fill="#C05621" d="M36 7 L42.6 6.75 L44 29.8 A4.6 4.6 0 0 1 36 30 Z"/>
+      <path class="ooru-f-cream" fill="#FAF6EC" d="M42.6 6.75 L49 6.5 L52 29.2 A4.25 4.25 0 0 1 44 29.8 Z"/>
+      <path class="ooru-f-terracotta" fill="#C05621" d="M49 6.5 L55.6 6.25 L60.2 28.1 A4.5 4.5 0 0 1 52 29.2 Z"/>
+      <path class="ooru-f-cream" fill="#FAF6EC" d="M55.6 6.25 L62 6 L68 26.5 A4.35 4.35 0 0 1 60.2 28.1 Z"/>
+      <g class="ooru-detail" style="display:var(--ooru-detail-display, inline)">
+        <path class="ooru-s-grain" stroke="#8A3A16" stroke-width="1.5" stroke-opacity=".45" d="M11.5 10.4 L60.5 8.4"/>
+      </g>
+      <path class="ooru-s-line" stroke="#0F3D21" stroke-width="3" d="M10 8 L62 6 L68 26.5 A4.35 4.35 0 0 1 60.2 28.1 A4.5 4.5 0 0 1 52 29.2 A4.25 4.25 0 0 1 44 29.8 A4.6 4.6 0 0 1 36 30 A4.2 4.2 0 0 1 28 29.9 A4.7 4.7 0 0 1 20.2 29.4 A4.3 4.3 0 0 1 12 28.6 A4.4 4.4 0 0 1 4 27.5 Z"/>
+      <path class="ooru-s-line" stroke="#0F3D21" stroke-width="3" d="M6.5 8.4 C25 7.4 46 6.4 65.5 5.6"/>
+    </g>
+  </symbol>
+
+  <!-- SIGNAGE BOARD: viewBox 0 0 56 48, a slightly tilted hanging board; the face is left empty for HTML text -->
+  <symbol id="ooru-signage-board" viewBox="0 0 56 48">
+    <title>Hanging signboard</title>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path class="ooru-s-line" stroke="#0F3D21" stroke-width="3" d="M12.5 17.6 L28 4.8 L44.2 16.2"/>
+      <path class="ooru-f-terracotta" fill="#C05621" d="M11 16.4 L45 15.1 Q48 15 48.1 18 L48.7 37.3 Q48.8 40.3 45.8 40.4 L11.8 41.4 Q8.8 41.5 8.7 38.5 L8 19.5 Q7.9 16.5 11 16.4 Z"/>
+      <path class="ooru-f-cream" fill="#FAF6EC" d="M13 19.5 L43.2 18.4 Q45 18.3 45.1 20.1 L45.5 35.6 Q45.6 37.4 43.8 37.5 L13.6 38.4 Q11.8 38.5 11.7 36.7 L11.3 21.4 Q11.2 19.6 13 19.5 Z"/>
+      <g class="ooru-detail" style="display:var(--ooru-detail-display, inline)">
+        <path class="ooru-s-grain" stroke="#8A3A16" stroke-width="1.5" stroke-opacity=".6" d="M16 17.6 L24 17.3 M31 17 L38.5 16.7 M19 39.9 L29 39.6 M35 39.4 L42 39.2"/>
+      </g>
+      <use href="#ooru-head-b" transform="translate(28 5.2) rotate(-10) scale(.42)"/>
+    </g>
+  </symbol>
+
+  <!-- BANANA LEAF: viewBox 0 0 48 48, a diagonal blade with a tapered midrib and one natural tear -->
+  <symbol id="ooru-banana-leaf" viewBox="0 0 48 48">
+    <title>Banana leaf</title>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path class="ooru-s-green-deep" stroke="#0F3D21" stroke-width="3" d="M2.6 46.8 C3.6 45.6 4.4 44.6 5.2 43.9"/>
+      <path class="ooru-f-green-lite" fill="#1B6B3A" d="M7.5 41.5 C3 31 8.5 15 21.5 9 C29.5 5.4 37 4.4 43 5 C30 15.5 18 28 7.5 41.5 Z"/>
+      <path class="ooru-f-green" fill="#14532D" d="M7.5 41.5 C18 28 30 15.5 43 5 C44.2 11.5 42.4 18.6 38.4 25 L34.2 23.6 L36.8 27 C30 34.8 18.6 43.6 7.5 41.5 Z"/>
+      <path class="ooru-f-sage" fill="#D9E2D2" d="M4.2 43.4 C13 33.6 25.4 20.6 42.8 5.2 C26.6 21.8 14.6 35 6 44.8 Z"/>
+      <g class="ooru-detail" style="display:var(--ooru-detail-display, inline)">
+        <path class="ooru-s-vein" stroke="#D9E2D2" stroke-width="1.5" stroke-opacity=".5" d="M16.4 32.3 Q14.8 28.6 14.3 24.7 M24 24.5 Q22.4 20.8 21.9 16.9 M31.6 16.7 Q30.4 13.8 30 10.6 M16.4 32.3 Q20.4 32.6 24.1 34.2 M24 24.5 Q28 24.9 31.4 26.2 M31.6 16.7 Q35 17.1 38 18.3"/>
+      </g>
+    </g>
+  </symbol>
+</svg>

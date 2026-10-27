@@ -1,0 +1,62 @@
+/* DW2 ASSEMBLY GLUE CSS — not a worker part. Loaded after dw2-tokens.css.
+   Holds the toran markup styling, the home-view switch-off, and the rule that
+   lifts the app's top-level content above the fixed #dw2-bg stack. */
+
+/* Stack hooks (integration.md §2). Re-stated here; perspective pinned to
+   1250px for the door rotateY (overrides the tokens' 160vw). */
+#dw2-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  perspective: 1250px;
+}
+#dw2-bg.dw2-off { display: none; }
+
+/* The app has no single root wrapper: its in-flow content is three body
+   children with no position/z-index. Raise exactly those above the stack.
+   (header.topbar is sticky z 50, nav.botnav fixed z 50, .toast fixed z 90:
+   already above, untouched.) */
+body > div.wrap,
+body > main.wrap,
+body > footer.foot {
+  position: relative;
+  z-index: 1;
+}
+
+/* Toran: above the doors (z 4 per tokens), faded by glue.js on scroll. */
+.dw2-toran {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(920px, 92vw);
+  display: flex;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.dw2-toran-swag {
+  display: block;
+  flex: 0 1 34%;
+  width: 34%;
+  height: auto;
+  aspect-ratio: 96 / 48;
+  overflow: visible;
+}
+.dw2-garland {
+  position: absolute;
+  top: 0;
+  height: 46vh;
+  width: auto;
+  aspect-ratio: 24 / 64;
+  overflow: visible;
+}
+.dw2-garland-l { left: 6%; }
+.dw2-garland-r { right: 6%; }
+
+/* ===== DW2 ASSEMBLY OVERRIDES — breakout headroom (Part 5 specimen leaves ~56px above cards) ===== */
+.rail{ padding-top:50px; }
+.grid{ padding-top:50px; row-gap:54px; }

@@ -1,0 +1,424 @@
+/* DW2 ASSEMBLY COPY of parts/design-system/tokens.css — paths rebased to doorway-v2 root, reduced-motion door rule appended. Source of truth remains the part file. */
+/* ==========================================================================
+   DOORWAY V2: DESIGN SYSTEM TOKENS + BACKGROUND LAYER CSS
+   Style: Photography-First × Editorial (see style-line.md).
+   Consumed by assembly. Engine contract: parts/engine-code/integration.md.
+
+   Law of this file:
+   - The engine writes transform / opacity / filter / visibility INLINE on
+     the host elements (.dw2-layer-*, .dw2-edge-*, .dw2-door-*) every frame,
+     and opacity on .dw2-veil. Nothing here sets those properties on a host,
+     and nothing here puts a transition on them.
+   - The photo and its PERMANENT softness live on each host's ::before.
+     A pseudo-element's opacity and filter are not overwritten by the host's
+     inline style. They compound with it (opacities multiply, blurs stack),
+     so permanent faintness and base blur are set here safely.
+   - The constant cream wash is #dw2-bg::after. The engine does not drive it.
+   - CONFLICT: marks every place where this recipe wants more than an
+     engine constant allows. The recipe is design law; assembly tunes the
+     engine to the number stated.
+   ========================================================================== */
+
+:root {
+  /* ---------------------------------------------------------------------
+     PALETTE: one canonical hex per role.
+     Revamp (shipped site layer) and symbols (parts/symbols/symbols.css)
+     diverge. Rulings:
+       cream       revamp #FAF5EC  vs symbols #FAF6EC  → #FAF5EC (the shipped
+                   ground; 1 unit apart, invisible. Symbols' cream is retired).
+       ink         revamp #1C2B21  vs symbols #1A202C  → #1C2B21 (green-black
+                   stays in family; #1A202C is a stock blue-grey).
+       green       revamp #1E5631  vs symbols #14532D  → #1E5631 (the site's
+                   action colour; 7.9:1 on cream).
+       green-deep  revamp #123B24  vs symbols #0F3D21  → #123B24.
+       green-lite  symbols #1B6B3A, no revamp twin    → kept, illustration leaf only.
+       accent      revamp --gold #E8A317 vs symbols marigold #F59E0B
+                   → #F59E0B (matches the photographed marigolds and the
+                   asset style line; --gold is retired into it).
+     Assembly maps symbols' --ooru-* names onto these when both are loaded.
+     --------------------------------------------------------------------- */
+  --ooru-cream:          #FAF5EC;   /* ground, wash, veil, plate */
+  --ooru-cream-2:        #F2EBDA;   /* tone step: footer band, quiet surfaces */
+  --ooru-card:           #FFFFFF;   /* tiles: cards, facts, filters, search */
+  --ooru-line:           #E3D9C3;   /* revamp tile edge, kept as shipped */
+  --ooru-sage:           #D9E2D2;   /* #dw2-bg ground under the photos */
+  --ooru-ink:            #1C2B21;   /* all running text */
+  --ooru-ink-2:          #45564A;   /* secondary notes only, 7.1:1 on cream */
+  --ooru-green:          #1E5631;   /* trust: primary action, links */
+  --ooru-green-deep:     #123B24;   /* trust, pressed / headings on bands */
+  --ooru-green-lite:     #1B6B3A;   /* illustration only */
+  --ooru-marigold:       #F59E0B;   /* THE accent: seam light, focus, wordmark dot */
+  --ooru-marigold-deep:  #D97706;   /* accent pressed state, illustration */
+  --ooru-terracotta:     #C05621;   /* illustration only (diya clay, awning) */
+  --ooru-clay-deep:      #8A3A16;   /* RULING: kept, illustration shading only.
+                                       Diya oil well, wood grain stroke inside
+                                       symbols.svg. Never UI, text, border or
+                                       fill area larger than a symbol.
+                                       See rationale.md §4. */
+  /* Amber never carries text: #F59E0B on cream is 2.0:1. Ink on marigold is 6.9:1. */
+
+  /* ---------------------------------------------------------------------
+     TYPE (revamp, unchanged). Elder law: body 17px, never smaller for
+     reading; 13px only for legal/credit lines.
+     --------------------------------------------------------------------- */
+  --ooru-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --t-xs: 13px;  --t-sm: 15px;  --t-base: 17px;  --t-md: 19px;
+  --t-lg: 22px;  --t-xl: 27px;  --t-2xl: 34px;   --t-3xl: 44px;
+  --lh-body: 1.55;
+  --lh-head: 1.08;
+  --track-head: -0.02em;
+
+  /* SPACING (revamp scale) */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 20px;
+  --s-6: 24px; --s-7: 32px; --s-8: 40px; --s-9: 56px;
+
+  /* RADIUS (revamp) */
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 26px; --r-pill: 999px;
+
+  /* TARGETS */
+  --target: 48px;          /* elder minimum, every control */
+  --target-search: 56px;   /* the opening search pill */
+
+  /* ---------------------------------------------------------------------
+     SECTION RHYTHM: the street breathes between rails.
+     The gap between rails is a window onto the street (no band behind it).
+     It is always larger than any gap inside a section.
+     --------------------------------------------------------------------- */
+  --dw2-gap-rail:      112px;  /* between rail bands, desktop (2 × --s-9) */
+  --dw2-band-pad-y:    40px;   /* band padding above/below a rail (--s-8) */
+  --dw2-band-pad-x:    24px;   /* page margin inside bands (--s-6) */
+  --dw2-gap-head:      24px;   /* rail heading → rail (--s-6) */
+  --dw2-window:        clamp(160px, 28vh, 280px);
+                               /* ONE street window per page: after the opening
+                                  zone, before the first text-dense zone.
+                                  Nothing but the street. Never a second one. */
+
+  /* ---------------------------------------------------------------------
+     STACK (integration.md §1). #dw2-bg is fixed at z 0 and is its own
+     stacking context. Inside it: far 0, mid 1, edges 2, veil 3, wash 3
+     (::after, paints after the veil, same tone, order irrelevant), doors 4.
+     Site content: z 1, above the whole stack.
+     --------------------------------------------------------------------- */
+  --z-far: 0; --z-mid: 1; --z-edge: 2; --z-veil: 3; --z-wash: 3; --z-door: 4;
+  --z-site: 1;
+
+  /* ---------------------------------------------------------------------
+     VEIL ALGEBRA. Street coverage = 1 − (1−wash)(1−veil)(1−band).
+       wash  = constant cream (#dw2-bg::after), set below
+       veil  = engine-driven, 0 → max over p 0.35 → 0.75
+       band  = site-layer zone band behind a section (scrolls with content)
+     --------------------------------------------------------------------- */
+  --dw2-wash: 0.55;
+  /* CONFLICT: engine VEIL_MAX_OPACITY is 0.52. Recipe wants 0.60.
+     Reason: at 0.60 the street windows between rails in the back half of the
+     page reach 1 − .45 × .40 = 0.82 coverage. That lets the wash stay at 0.55,
+     so the opening shows more street on arrival. With the engine left at 0.52,
+     assembly must raise --dw2-wash to 0.58 to hold the same 0.80+ windows,
+     and the opening gets duller. */
+  --dw2-veil-max-wanted: 0.60;
+  --dw2-wash-if-engine-052: 0.58;
+
+  /* Zone bands. Coverage values below are computed with wash .55.
+     The worst case is veil 0 (top of page); the deep case is veil .60.            */
+  --dw2-band-open:   0;     /* opening: no band; copy sits on the solid plate      */
+  --dw2-band-mid:    0.62;  /* rails of tiles: worst .83, deep .93                 */
+  --dw2-band-text:   0.86;  /* text-dense: facts, how-it-works, long copy:
+                               worst .94, deep .98                                 */
+  --dw2-band-footer: 0.94;  /* footer: worst .97, deep .99. The street never
+                               fully disappears (engine late calm holds it)        */
+  --dw2-band-feather: 40px; /* masked soft top/bottom edge on every band           */
+
+  /* ---------------------------------------------------------------------
+     LAYER PHOTO RECIPE (applied to ::before, never the host).
+     Mapping (assets in parts/assets-photo/):
+       far        pandal-far.png   1672×941, whole frame, cover, 50% 46%
+       mid        pandal-far.png   SAME FILE, honest reuse: its wet-stone
+                                   street floor only (bottom 48%), pre-scaled
+                                   1.18, masked above 52%. There is no mid asset.
+                                   The floor is the nearest thing in the frame,
+                                   so it rides the faster mid track (scale to
+                                   1.20) and the ground visibly comes toward you.
+                                   Its reflections have little detail, so the
+                                   doubled image never reads.
+       edge-left  stalls-left.png  941×1672, 30vw strip, masked inward
+       edge-right stalls-right.png 1024×1536, 30vw strip, masked inward
+                                   (dimensions differ; both are height-fit, so
+                                   they match on screen)
+       doors      door-left.png / door-right.png 1024×1536 carved pair
+       breakouts  lamp / marigold / banana-leaves: NOT used in the background.
+                  They sit on opaque RGB(3,18,10). Over a cream wash only a
+                  screen blend hides that, and screen bleaches the brass.
+                  They need real alpha cutouts first.
+     --------------------------------------------------------------------- */
+  --dw2-far-blur:   1.5px;  --dw2-far-sat:   0.85;  --dw2-far-bright:  1.04;
+  --dw2-mid-blur:   2px;    --dw2-mid-sat:   0.85;  --dw2-mid-bright:  1.02;
+  --dw2-edge-blur:  2.5px;  --dw2-edge-sat:  0.90;  --dw2-edge-bright: 1.00;
+  --dw2-edge-w:     30vw;
+  --dw2-edge-min-w: 280px;
+  /* Base blur compounds with the engine's shared blur (≈ √(a² + b²)).
+     CONFLICT: engine SOFTEN_MAX_BLUR_PX is 3.5. Recipe wants 5.5.
+     Reason: at 3.5 + base, the deep-walk total is far 3.8 / mid 4.0 / edges 4.3px.
+     At 1440 wide the string-light points still read as hard sparkles behind
+     22–27px rail headings in the street windows. At 5.5 the totals are
+     5.7 / 5.9 / 6.0px and the lights soften into bokeh, so headings stop
+     fighting them. Opening stays sharp either way (engine blur 0 at p < .35). */
+  --dw2-blur-max-wanted: 5.5px;
+
+  /* ---------------------------------------------------------------------
+     DOORS
+     Leaf box: 50vw × 100vh each (+1px overlap at the seam).
+     Image 1024×1536 = 2:3 (0.667). Box aspect: 1440×900 → 720×900 = 0.8;
+     1920×1080 → 0.89; 390×844 → 0.23.
+     background-size: cover, never stretched. Desktop: the box is wider than
+     2:3, so the photo fits by width and crops 10–17% top/bottom. The
+     position keeps the upper medallion at 42%. Phone: fits by height and
+     crops the outer side; the inner edge (brass boss, inner border, half
+     the medallion) stays, because position anchors the INNER edge
+     (left leaf 100%, right leaf 0%).
+     RULING: open angle 82deg (engine), not v1's 97deg. rationale.md §5.
+     Perspective 160vw: free-edge depth at 82deg is 0.5W·sin82 = 0.495W,
+     always well inside 1.6W, so the leaf never crosses the eye plane at any
+     width, and the open pose projects the same at 390 and 1920:
+     free-edge scale 1.6/(1.6−0.495) = 1.45; each open leaf shows as a
+     ~10%-of-width carved sliver at its screen edge, overshooting top and
+     bottom by ~22vh. Then the pass-through (+118px outward) carries it off.
+     --------------------------------------------------------------------- */
+  --dw2-door-angle: 82deg;           /* engine constant, agreed */
+  --dw2-perspective: 160vw;
+  --dw2-door-pos-y: 42%;
+  --dw2-seam-w: 3px;                 /* marigold light between shut leaves */
+  --dw2-seam-opacity: 0.85;
+  /* Opening timing (engine): 0.55s quiet beat, then 1.6s expo.out (1 − 2^(−10t)).
+     CSS stand-in for mocks ONLY: cubic-bezier(.16, 1, .3, 1).                    */
+  --dw2-ease-expo-out: cubic-bezier(.16, 1, .3, 1);
+}
+
+/* ==========================================================================
+   THE STACK
+   ========================================================================== */
+#dw2-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--ooru-sage);
+  perspective: var(--dw2-perspective);
+  perspective-origin: 50% 50%;
+}
+
+/* The constant wash: non-driven, carries permanent faintness. */
+#dw2-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-wash);
+  background: var(--ooru-cream);
+  opacity: var(--dw2-wash);
+}
+
+.dw2-layer-far,
+.dw2-layer-mid,
+.dw2-edge-left,
+.dw2-edge-right {
+  position: absolute;
+  will-change: transform, opacity, filter;
+}
+.dw2-layer-far::before,
+.dw2-layer-mid::before,
+.dw2-edge-left::before,
+.dw2-edge-right::before {
+  content: "";
+  position: absolute;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* far: the pandal at the end of the street */
+.dw2-layer-far { inset: 0; z-index: var(--z-far); }
+.dw2-layer-far::before {
+  inset: -12px;                                   /* blur edge bleed */
+  background-image: url("pandal-far.jpg");
+  background-position: 50% 46%;
+  filter: blur(var(--dw2-far-blur)) saturate(var(--dw2-far-sat)) brightness(var(--dw2-far-bright));
+}
+
+/* mid: the wet-stone floor of the same frame, nearer and faster */
+.dw2-layer-mid {
+  inset: 0;
+  z-index: var(--z-mid);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 52%, #000 72%, #000 100%);
+          mask-image: linear-gradient(to bottom, transparent 0, transparent 52%, #000 72%, #000 100%);
+}
+.dw2-layer-mid::before {
+  inset: -9% -9% -9% -9%;                          /* 1.18 pre-scale */
+  background-image: url("pandal-far.jpg");
+  background-position: 50% 100%;
+  filter: blur(var(--dw2-mid-blur)) saturate(var(--dw2-mid-sat)) brightness(var(--dw2-mid-bright));
+}
+
+/* edges: the stall rows passing at the sides */
+.dw2-edge-left,
+.dw2-edge-right {
+  top: 0;
+  bottom: 0;
+  width: max(var(--dw2-edge-w), var(--dw2-edge-min-w));
+  z-index: var(--z-edge);
+}
+.dw2-edge-left {
+  left: 0;
+  -webkit-mask-image: linear-gradient(to right, #000 0, #000 45%, transparent 100%);
+          mask-image: linear-gradient(to right, #000 0, #000 45%, transparent 100%);
+}
+.dw2-edge-right {
+  right: 0;
+  -webkit-mask-image: linear-gradient(to left, #000 0, #000 45%, transparent 100%);
+          mask-image: linear-gradient(to left, #000 0, #000 45%, transparent 100%);
+}
+.dw2-edge-left::before,
+.dw2-edge-right::before {
+  inset: -12px;
+  filter: blur(var(--dw2-edge-blur)) saturate(var(--dw2-edge-sat)) brightness(var(--dw2-edge-bright));
+}
+.dw2-edge-left::before  { background-image: url("stalls-left.jpg");  background-position: 0% 60%; }
+.dw2-edge-right::before { background-image: url("stalls-right.jpg"); background-position: 100% 60%; }
+
+/* veil: engine sets opacity only (0 → 0.52 today; 0.60 wanted) */
+.dw2-veil {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-veil);
+  background: var(--ooru-cream);
+}
+
+/* doors: the carved pair, first steps of the walk.
+   transform-origin is set inline by the engine (0% 50% / 100% 50%); not here. */
+.dw2-door-left,
+.dw2-door-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(50% + 1px);
+  z-index: var(--z-door);
+  background-repeat: no-repeat;
+  background-size: cover;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+.dw2-door-left  { left: 0;  background-image: url("door-left.jpg");  background-position: 100% var(--dw2-door-pos-y); }
+.dw2-door-right { right: 0; background-image: url("door-right.jpg"); background-position: 0%   var(--dw2-door-pos-y); }
+
+/* light between the shut leaves; rides the left leaf, fades with it */
+.dw2-door-left::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: var(--dw2-seam-w);
+  background: var(--ooru-marigold);
+  opacity: var(--dw2-seam-opacity);
+}
+
+/* ==========================================================================
+   SITE LAYER: zones, tiles, glass rules
+   ========================================================================== */
+.dw2-site { position: relative; z-index: var(--z-site); }
+
+/* Zone bands sit behind a section and scroll with it. Flat cream with feathered
+   top/bottom edges (a mask, so the band never reads as a box). */
+.dw2-zone {
+  position: relative;
+  padding: var(--dw2-band-pad-y) var(--dw2-band-pad-x);
+}
+.dw2-zone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ooru-cream);
+  opacity: var(--dw2-band, 0);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--dw2-band-feather), #000 calc(100% - var(--dw2-band-feather)), transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0, #000 var(--dw2-band-feather), #000 calc(100% - var(--dw2-band-feather)), transparent 100%);
+}
+.dw2-zone--open   { --dw2-band: var(--dw2-band-open); }
+.dw2-zone--mid    { --dw2-band: var(--dw2-band-mid); }
+.dw2-zone--text   { --dw2-band: var(--dw2-band-text); }
+.dw2-zone--footer { --dw2-band: var(--dw2-band-footer); }
+.dw2-zone--footer::before { background: var(--ooru-cream-2); }
+.dw2-zone + .dw2-zone { margin-top: var(--dw2-gap-rail); }
+.dw2-window { height: var(--dw2-window); }      /* the single street window */
+
+/* What may sit where:
+   - Body text (17px) ONLY on a solid tile or on .dw2-zone--text.
+   - .dw2-zone--mid carries headings ≥ 22px and solid tiles; no body copy loose on it.
+   - Nothing is ever set directly on the street (wash only). */
+
+/* Tiles: SOLID. Cards, facts panels, filters, forms, search, the opening plate.
+   Alpha 1, no backdrop-filter, ever. Revamp card styles stay as shipped. */
+.dw2-tile {
+  background: var(--ooru-card);
+  border-radius: var(--r-lg);
+}
+.dw2-plate {                                     /* the opening nameboard */
+  background: var(--ooru-cream);
+  border-radius: var(--r-xl);
+  padding: var(--s-7) var(--s-8);
+  max-width: 720px;
+}
+
+/* Glass: allowed in ONE place, the sticky top bar once scrolled.
+   Conditions: alpha ≥ 0.90, blur 12px, and nothing smaller than 15px/600
+   sits directly on it (brand + solid search pill only).
+   Forbidden everywhere else: cards, facts, filter panels, body text, footer,
+   the opening plate. Under 0.90 the photo shows through the letters. */
+.dw2-bar--scrolled {
+  background: rgb(250 245 236 / 0.92);
+  -webkit-backdrop-filter: blur(12px);
+          backdrop-filter: blur(12px);
+}
+
+/* Focus: the accent's one interactive job. */
+.dw2-site :focus-visible {
+  outline: 3px solid var(--ooru-marigold);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   MOBILE (< 640px). Engine multiplies outward travel by 0.72 itself.
+   ========================================================================== */
+@media (max-width: 639px) {
+  :root {
+    --dw2-wash: 0.62;            /* text column spans the screen; more calm */
+    --dw2-wash-if-engine-052: 0.65;
+    --dw2-gap-rail: 72px;        /* --s-8 + --s-7 */
+    --dw2-band-pad-y: 32px;
+    --dw2-band-pad-x: 16px;
+    --dw2-window: clamp(120px, 22vh, 180px);
+    --dw2-edge-w: 34vw;
+    --dw2-edge-min-w: 0px;
+    --dw2-edge-blur: 2px;        /* smaller strips, less blur needed */
+  }
+  .dw2-edge-left  { -webkit-mask-image: linear-gradient(to right, #000 0, #000 30%, transparent 100%); mask-image: linear-gradient(to right, #000 0, #000 30%, transparent 100%); }
+  .dw2-edge-right { -webkit-mask-image: linear-gradient(to left,  #000 0, #000 30%, transparent 100%); mask-image: linear-gradient(to left,  #000 0, #000 30%, transparent 100%); }
+  .dw2-plate { padding: var(--s-5) var(--s-6); border-radius: var(--r-lg); }
+}
+
+/* ==========================================================================
+   REDUCED MOTION. The engine stands the doors open, street at scale 1,
+   layer opacity 0.34, veil 0.24, and never fades the doors.
+   Left alone, the open leaves become two permanent carved pillars at the
+   screen edges for the whole page: a frame, which v2 removed.
+   RULING: doors are not rendered under reduced motion (display is not an
+   engine-driven property). Reduced-motion visitors arrive in the street.
+   Wash drops so the 0.34-opacity street still reads:
+   visible street ≈ .34 × (1−.40) × (1−.24) = 0.16.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dw2-wash: 0.40; }
+  .dw2-door-left,
+  .dw2-door-right { display: none; }
+}
+
+/* DW2 ASSEMBLY: design-system ruling — doors are not rendered under reduced motion; the engine stands them open, CSS removes them so the faint still street is the reduced experience. */
+@media (prefers-reduced-motion: reduce){ .dw2-door-left,.dw2-door-right{ display:none !important; } }
